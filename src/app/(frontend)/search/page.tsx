@@ -4,7 +4,7 @@ import { CollectionArchive } from '@/components/CollectionArchive'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import { Post } from '@/payload-types'
+import { Ingredient, Post, Recipe } from '@/payload-types'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
 
@@ -17,8 +17,10 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   const { q: query } = await searchParamsPromise
   const payload = await getPayload({ config: configPromise })
 
-  const posts = await payload.find({
-    collection: 'search',
+  console.log('payload', payload);
+
+  const recipes = await payload.find({
+    collection: 'recipes',
     depth: 1,
     limit: 12,
     ...(query
@@ -27,16 +29,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
             or: [
               {
                 title: {
-                  like: query,
-                },
-              },
-              {
-                'meta.description': {
-                  like: query,
-                },
-              },
-              {
-                'meta.title': {
                   like: query,
                 },
               },
@@ -61,8 +53,8 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
         </div>
       </div>
 
-      {posts.totalDocs > 0 ? (
-        <CollectionArchive posts={posts.docs as unknown as Post[]} />
+      {recipes.totalDocs > 0 ? (
+        <CollectionArchive posts={recipes.docs} />
       ) : (
         <div className="container">No results found.</div>
       )}

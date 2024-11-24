@@ -3,6 +3,9 @@ import { CollectionSlug } from 'payload'
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: '/posts',
   pages: '',
+  recipes: '/recipes',
+  courses: '/courses',
+  ingredients: '/ingredients',
 }
 
 type Props = {
@@ -11,6 +14,7 @@ type Props = {
 }
 
 export const generatePreviewPath = ({ collection, slug }: Props) => {
+  console.log({collection, slug})
   const path = `${collectionPrefixMap[collection]}/${slug}`
 
   const params = {

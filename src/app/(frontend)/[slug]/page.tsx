@@ -5,13 +5,13 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
-import { homeStatic } from '@/endpoints/seed/home-static'
 
 import type { Page as PageType } from '@/payload-types'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RenderHero } from '@/heros/RenderHero'
-import { generateMeta } from '@/utilities/generateMeta'
+import { homeStatic } from '@/endpoints/seed/home-static'
+
 import PageClient from './page.client'
 
 export async function generateStaticParams() {
@@ -41,6 +41,11 @@ type Args = {
   params: Promise<{
     slug?: string
   }>
+}
+
+export const metadata: Metadata = {
+  title: 'MM',
+  description: 'Your Recipe Collection'
 }
 
 export default async function Page({ params: paramsPromise }: Args) {
@@ -74,15 +79,6 @@ export default async function Page({ params: paramsPromise }: Args) {
       <RenderBlocks blocks={layout} />
     </article>
   )
-}
-
-export async function generateMetadata({ params: paramsPromise }): Promise<Metadata> {
-  const { slug = 'home' } = await paramsPromise
-  const page = await queryPageBySlug({
-    slug,
-  })
-
-  return generateMeta({ doc: page })
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {

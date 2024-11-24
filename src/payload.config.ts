@@ -10,7 +10,12 @@ import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { Recipes } from './collections/Recipes'
+import { Ingredients } from './collections/Ingredients'
+import { Courses } from './collections/Courses'
+import { CookingTechniques } from './collections/CookingTechniques'
 import { Users } from './collections/Users'
+import { Ratings } from './collections/Ratings'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -64,7 +69,7 @@ export default buildConfig({
       url: process.env.DATABASE_URI || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Pages, Posts, Media, Categories, Users, Recipes, Courses, CookingTechniques, Ingredients, Ratings],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

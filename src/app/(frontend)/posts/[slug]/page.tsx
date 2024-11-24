@@ -39,6 +39,11 @@ type Args = {
   }>
 }
 
+export const metadata: Metadata = {
+  title: 'Blog Posts',
+  description: 'Read our latest blog posts'
+}
+
 export default async function Post({ params: paramsPromise }: Args) {
   const { slug = '' } = await paramsPromise
   const url = '/posts/' + slug
@@ -68,13 +73,6 @@ export default async function Post({ params: paramsPromise }: Args) {
       </div>
     </article>
   )
-}
-
-export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug = '' } = await paramsPromise
-  const post = await queryPostBySlug({ slug })
-
-  return generateMeta({ doc: post })
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {

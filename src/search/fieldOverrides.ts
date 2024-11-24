@@ -10,6 +10,12 @@ export const searchFields: Field[] = [
     },
   },
   {
+    name: 'image',
+    label: 'Image',
+    type: 'upload',
+    relationTo: 'media',
+  },
+  {
     name: 'meta',
     label: 'Meta',
     type: 'group',
