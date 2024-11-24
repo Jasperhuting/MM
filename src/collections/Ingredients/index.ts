@@ -205,6 +205,7 @@ export const Ingredients: CollectionConfig = {
   hooks: {
     beforeChange: [addCurrentUserAsAuthor],
     afterChange: [revalidateIngredient],
+    
   },
   versions: {
     drafts: {

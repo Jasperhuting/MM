@@ -205,7 +205,6 @@ export const Recipes: CollectionConfig = {
   hooks: {
     beforeChange: [addCurrentUserAsAuthor],
     afterChange: [revalidateRecipe],
-    afterRead: [populateAuthors],
   },
   versions: {
     drafts: {
