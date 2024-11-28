@@ -3,9 +3,6 @@ import { Media } from '@/components/Media'
 import { Ingredient } from "@/payload-types";
 
 export const IngredientsList = ({ ingredients }: { ingredients: (number | Ingredient)[] }) => {
-
-    console.log('ingredients', ingredients)
-
     return <div className="flex flex-col">
     <h3>Ingredientenlijst:</h3>
     <ul>{ingredients.map((ingredient, index) => {

@@ -31,8 +31,6 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const { image } = ingredient
 
-  console.log('ingredient', ingredient)
-
   return (
     <article className="pt-16 pb-24">
       <PageClient />

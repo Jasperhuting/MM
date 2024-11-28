@@ -66,6 +66,7 @@ export const Ingredients: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    ...slugField(),
     {
       name: 'image',
       type: 'upload',
@@ -113,39 +114,36 @@ export const Ingredients: CollectionConfig = {
       required: false,
     },
     {
-      type: 'tabs',
-      tabs: [
-        {
-          fields: [
-            {
-              name: 'relatedIngredients',
-              type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
-              filterOptions: ({ id }) => {
-                return {
-                  id: {
-                    not_in: [id],
-                  },
-                }
-              },
-              hasMany: true,
-              relationTo: 'ingredients',
-            },
-            {
-              name: 'categories',
-              type: 'relationship',
-              admin: {
-                position: 'sidebar',
-              },
-              hasMany: true,
-              relationTo: 'categories',
-            },
-          ],
-          label: 'Meta',
-        },
-      ],
+      name: 'recipes',
+      type: 'relationship',
+      relationTo: 'recipes',
+      hasMany: true,
+      required: false,
+    },
+    {
+      name: 'relatedIngredients',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+      },
+      filterOptions: ({ id }) => {
+        return {
+          id: {
+            not_in: [id],
+          },
+        }
+      },
+      hasMany: true,
+      relationTo: 'ingredients',
+    },
+    {
+      name: 'categories',
+      type: 'relationship',
+      admin: {
+        position: 'sidebar',
+      },
+      hasMany: true,
+      relationTo: 'categories',
     },
     {
       name: 'publishedAt',
@@ -200,7 +198,6 @@ export const Ingredients: CollectionConfig = {
         },
       ],
     },
-    ...slugField(),
   ],
   hooks: {
     beforeChange: [addCurrentUserAsAuthor],

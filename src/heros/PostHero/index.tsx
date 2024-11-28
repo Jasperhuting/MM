@@ -3,12 +3,10 @@ import React from 'react'
 
 import type { Post } from '@/payload-types'
 
-import { Media } from '@/components/Media'
-
 export const PostHero: React.FC<{
   post: Post
 }> = ({ post }) => {
-  const { categories, meta: { image: metaImage } = {}, populatedAuthors, publishedAt, title } = post
+  const { categories, populatedAuthors, publishedAt, title } = post
 
   return (
     <div className="relative -mt-[10.4rem] flex items-end">
@@ -78,9 +76,6 @@ export const PostHero: React.FC<{
         </div>
       </div>
       <div className="min-h-[80vh] select-none">
-        {metaImage && typeof metaImage !== 'string' && (
-          <Media fill imgClassName="-z-10 object-cover" resource={metaImage} />
-        )}
         <div className="absolute pointer-events-none left-0 bottom-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
       </div>
     </div>

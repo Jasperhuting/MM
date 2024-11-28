@@ -129,7 +129,7 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock | StepBlock)[];
   meta?: {
     title?: string | null;
     image?: (number | null) | Media;
@@ -377,6 +377,7 @@ export interface Category {
  */
 export interface Post {
   id: number;
+  _status: 'draft' | 'published';
   title: string;
   content: {
     root: {
@@ -395,8 +396,8 @@ export interface Post {
   };
   relatedPosts?: (number | Post)[] | null;
   categories?: (number | Category)[] | null;
-  publishedAt?: string | null;
   authors?: (number | User)[] | null;
+  publishedAt?: string | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -618,15 +619,49 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepBlock".
+ */
+export interface StepBlock {
+  arrayField?:
+    | {
+        step: string;
+        stepcontent: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stepBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "recipes".
  */
 export interface Recipe {
   id: number;
   title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   averageRating?: number | null;
   totalRatings?: number | null;
   ingredients: (number | Ingredient)[];
+  relatedIngredients?: (number | Ingredient)[] | null;
   preparationTime?: string | null;
+  categories?: (number | Category)[] | null;
   image?: (number | null) | Media;
   cookingInstructions?: {
     root: {
@@ -643,7 +678,6 @@ export interface Recipe {
     };
     [k: string]: unknown;
   } | null;
-  categories?: (number | Category)[] | null;
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
   populatedAuthors?:
@@ -652,11 +686,9 @@ export interface Recipe {
         name?: string | null;
       }[]
     | null;
-  slug?: string | null;
-  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  _status: 'draft' | 'published';
+  _status: 'draft' | 'published' | 'draft' | 'published';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -665,9 +697,12 @@ export interface Recipe {
 export interface Ingredient {
   id: number;
   title: string;
+  slug?: string | null;
+  slugLock?: boolean | null;
   image?: (number | null) | Media;
   ingredientsAmount: number;
   measurements?: ('grams' | 'kilograms' | 'liters' | 'milliliters' | 'amount' | 'teaspoons' | 'tablespoons') | null;
+  recipes?: (number | Recipe)[] | null;
   relatedIngredients?: (number | Ingredient)[] | null;
   categories?: (number | Category)[] | null;
   publishedAt?: string | null;
@@ -678,8 +713,6 @@ export interface Ingredient {
         name?: string | null;
       }[]
     | null;
-  slug?: string | null;
-  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1037,6 +1070,19 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        stepBlock?:
+          | T
+          | {
+              arrayField?:
+                | T
+                | {
+                    step?: T;
+                    stepcontent?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
       };
   meta?:
     | T
@@ -1059,12 +1105,13 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "posts_select".
  */
 export interface PostsSelect<T extends boolean = true> {
+  _status?: T;
   title?: T;
   content?: T;
   relatedPosts?: T;
   categories?: T;
-  publishedAt?: T;
   authors?: T;
+  publishedAt?: T;
   populatedAuthors?:
     | T
     | {
@@ -1199,13 +1246,16 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface RecipesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
+  slugLock?: T;
   averageRating?: T;
   totalRatings?: T;
   ingredients?: T;
+  relatedIngredients?: T;
   preparationTime?: T;
+  categories?: T;
   image?: T;
   cookingInstructions?: T;
-  categories?: T;
   publishedAt?: T;
   authors?: T;
   populatedAuthors?:
@@ -1214,8 +1264,6 @@ export interface RecipesSelect<T extends boolean = true> {
         id?: T;
         name?: T;
       };
-  slug?: T;
-  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1288,9 +1336,12 @@ export interface CookingTechniquesSelect<T extends boolean = true> {
  */
 export interface IngredientsSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
+  slugLock?: T;
   image?: T;
   ingredientsAmount?: T;
   measurements?: T;
+  recipes?: T;
   relatedIngredients?: T;
   categories?: T;
   publishedAt?: T;
@@ -1301,8 +1352,6 @@ export interface IngredientsSelect<T extends boolean = true> {
         id?: T;
         name?: T;
       };
-  slug?: T;
-  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

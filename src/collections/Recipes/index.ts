@@ -20,6 +20,7 @@ import { revalidateRecipe } from './hooks/revalidateRecipe'
 import { addCurrentUserAsAuthor } from '../../hooks/addCurrentUserAsAuthor'
 import { slugField } from '@/fields/slug'
 import { getServerSideURL } from '@/utilities/getURL'
+import { StepBlock } from '@/blocks/StepBlock/config'
 
 export const Recipes: CollectionConfig = {
   slug: 'recipes',
@@ -79,10 +80,21 @@ export const Recipes: CollectionConfig = {
       },
     },
     {
+      type: 'row',
+      fields: [
+    {
       name: 'title',
       type: 'text',
       required: true,
     },
+    ...slugField(),
+      ]},
+      {
+        type: 'row',
+        admin: {
+          position: 'sidebar',
+        },
+        fields: [
     {
       name: 'averageRating',
       type: 'number',
@@ -90,7 +102,6 @@ export const Recipes: CollectionConfig = {
       admin: {
         description: 'Automatically calculated average rating for this recipe',
         readOnly: true,
-        position: 'sidebar',
       },
     },
     {
@@ -100,9 +111,8 @@ export const Recipes: CollectionConfig = {
       admin: {
         description: 'Total number of ratings for this recipe',
         readOnly: true,
-        position: 'sidebar',
       },
-    },
+    },]},
     {
       name: 'ingredients',
       type: 'relationship',
@@ -111,10 +121,35 @@ export const Recipes: CollectionConfig = {
       required: true,
     },
     {
-      name: 'preparationTime',
-      type: 'text',
-      required: false,
+      name: 'relatedIngredients',
+      type: 'relationship',
+      relationTo: 'ingredients',
+      hasMany: true,
+      label: 'Related Ingredients',
+      admin: {
+        position: 'sidebar',
+      }
     },
+    {
+    type: 'row',
+    fields: [
+      {
+        name: 'preparationTime',
+        type: 'text',
+        required: false,
+      },
+      {
+        name: 'categories',
+        type: 'relationship',
+        admin: {
+          position: 'sidebar',
+        },
+        hasMany: true,
+        relationTo: 'categories',
+      },
+    ],
+    },
+    
     {
       name: 'image',
       type: 'upload',
@@ -130,7 +165,7 @@ export const Recipes: CollectionConfig = {
             ...rootFeatures,
             HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
             BlocksFeature({
-              blocks: [Banner, Code, MediaBlock],
+              blocks: [Banner, Code, MediaBlock, StepBlock],
             }),
             FixedToolbarFeature(),
             InlineToolbarFeature(),
@@ -140,15 +175,6 @@ export const Recipes: CollectionConfig = {
       }),
       label: "Cooking Instructions",
       required: false,
-    },
-    {
-      name: 'categories',
-      type: 'relationship',
-      admin: {
-        position: 'sidebar',
-      },
-      hasMany: true,
-      relationTo: 'categories',
     },
     {
       name: 'publishedAt',
@@ -200,11 +226,41 @@ export const Recipes: CollectionConfig = {
         },
       ],
     },
-    ...slugField(),
   ],
   hooks: {
     beforeChange: [addCurrentUserAsAuthor],
-    afterChange: [revalidateRecipe],
+    afterChange: [
+      revalidateRecipe,
+      async ({ doc, operation, req: { payload } }) => {
+        // After a recipe is created or updated, update the ingredients' recipes field
+        if (operation === 'create' || operation === 'update') {
+          const ingredients = doc.ingredients || [];
+          
+          // For each ingredient in the recipe
+          for (const ingredientId of ingredients) {
+            // Get the current ingredient
+            const ingredient = await payload.findByID({
+              collection: 'ingredients',
+              id: ingredientId,
+            });
+
+            // Get current recipes list
+            const currentRecipes = ingredient.recipes || [];
+
+            // Add this recipe if it's not already in the list
+            if (!currentRecipes.includes(doc.id)) {
+              await payload.update({
+                collection: 'ingredients',
+                id: ingredientId,
+                data: {
+                  recipes: [...currentRecipes, doc.id],
+                },
+              });
+            }
+          }
+        }
+      },
+    ],
   },
   versions: {
     drafts: {

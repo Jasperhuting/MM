@@ -1,12 +1,12 @@
 import type { Metadata } from 'next/types'
 
-import { CollectionArchive } from '@/components/CollectionArchive'
+// import { CollectionArchive } from '@/components/CollectionArchive'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
-import { Ingredient, Post, Recipe } from '@/payload-types'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
+import { CollectionArchive } from '@/components/CollectionArchive'
 
 type Args = {
   searchParams: Promise<{
@@ -17,10 +17,8 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   const { q: query } = await searchParamsPromise
   const payload = await getPayload({ config: configPromise })
 
-  console.log('payload', payload);
-
   const recipes = await payload.find({
-    collection: 'recipes',
+    collection: 'search',
     depth: 1,
     limit: 12,
     ...(query
@@ -54,7 +52,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       </div>
 
       {recipes.totalDocs > 0 ? (
-        <CollectionArchive posts={recipes.docs} />
+        <CollectionArchive posts={recipes.docs} relationTo='recipes' />
       ) : (
         <div className="container">No results found.</div>
       )}

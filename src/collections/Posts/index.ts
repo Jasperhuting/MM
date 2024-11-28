@@ -58,6 +58,25 @@ export const Posts: CollectionConfig = {
   },
   fields: [
     {
+      name: '_status',
+      type: 'select',
+      required: true,
+      defaultValue: 'draft',
+      options: [
+        {
+          label: 'Draft',
+          value: 'draft',
+        },
+        {
+          label: 'Published',
+          value: 'published',
+        },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'title',
       type: 'text',
       required: true,
@@ -116,22 +135,32 @@ export const Posts: CollectionConfig = {
               },
             },
             {
-              name: 'publishedAt',
-              type: 'date',
-              admin: {
-                position: 'sidebar',
-                date: {
-                  pickerAppearance: 'dayAndTime',
-                },
-              },
-            },
-            {
               name: 'authors',
               type: 'relationship',
               relationTo: 'users',
               hasMany: true,
               admin: {
                 position: 'sidebar',
+              },
+            },
+            {
+              name: 'publishedAt',
+              type: 'date',
+              admin: {
+                date: {
+                  pickerAppearance: 'dayAndTime',
+                },
+                position: 'sidebar',
+              },
+              hooks: {
+                beforeChange: [
+                  ({ siblingData, value }) => {
+                    if (siblingData._status === 'published' && !value) {
+                      return new Date()
+                    }
+                    return value
+                  },
+                ],
               },
             },
             {

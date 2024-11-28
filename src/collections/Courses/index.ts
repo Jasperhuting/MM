@@ -33,7 +33,7 @@ export const Courses: CollectionConfig = {
     categories: true,
   },
   admin: {
-    group: 'Recipes',
+    group: 'Recepten',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) => {

@@ -49,7 +49,7 @@ export const CookingTechniques: CollectionConfig = {
     },
   },
   admin: {
-    group: 'Recipes',
+    group: 'Recepten',
     defaultColumns: ['title', 'slug', 'updatedAt'],
     livePreview: {
       url: ({ data }) => {

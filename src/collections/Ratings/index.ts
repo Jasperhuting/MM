@@ -109,7 +109,7 @@ export const Ratings: CollectionConfig = {
       relationTo: 'users',
       required: true,
       admin: {
-        readOnly: true,
+        readOnly: false,
       },
     },
   ],

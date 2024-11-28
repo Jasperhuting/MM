@@ -12,7 +12,7 @@ export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
   doc?: Recipe | Ingredient
-  relationTo?: 'recipes'
+  relationTo?: 'recipes' | 'ingredients'
   showCategories?: boolean
   title?: string
 }> = (props) => {

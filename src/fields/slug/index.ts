@@ -36,7 +36,6 @@ export const slugField: Slug = (fieldToUse = 'title', overrides = {}) => {
       beforeValidate: [formatSlugHook(fieldToUse)],
     },
     admin: {
-      position: 'sidebar',
       ...(slugOverrides?.admin || {}),
       components: {
         Field: {

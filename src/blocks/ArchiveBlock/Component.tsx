@@ -59,7 +59,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ml-0 max-w-[48rem]" content={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive posts={posts} />
+      {/* <CollectionArchive posts={posts} /> */}
     </div>
   )
 }

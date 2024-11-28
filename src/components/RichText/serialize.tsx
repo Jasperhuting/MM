@@ -1,6 +1,8 @@
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
+import { StepBlock } from '@/blocks/StepBlock/Component'
+import type { StepBlock as StepBlockProps } from '@/payload-types'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import React, { Fragment, JSX } from 'react'
 import { CMSLink } from '@/components/Link'
@@ -23,7 +25,7 @@ import type {
 
 export type NodeTypes =
   | DefaultNodeTypes
-  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps>
+  | SerializedBlockNode<CTABlockProps | MediaBlockProps | BannerBlockProps | CodeBlockProps | StepBlockProps>
 
 type Props = {
   nodes: NodeTypes[]
@@ -122,6 +124,8 @@ export function serializeLexical({ nodes }: Props): JSX.Element {
               return <BannerBlock className="col-start-2 mb-4" key={index} {...block} />
             case 'code':
               return <CodeBlock className="col-start-2" key={index} {...block} />
+            case 'stepBlock':
+              return <StepBlock className="col-start-2" key={index} {...block} />
             default:
               return null
           }

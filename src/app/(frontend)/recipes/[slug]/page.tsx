@@ -10,7 +10,6 @@ import { Media } from '@/components/Media'
 
 import type { Recipe } from '@/payload-types'
 
-import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { IngredientsList } from '@/components/IngredientsList'
 
@@ -37,8 +36,6 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const { image, preparationTime, cookingInstructions, ingredients } = recipe
 
-  console.log('recipe', recipe)
-
   return (
     <article className="pb-24">
       <PageClient />
@@ -59,7 +56,7 @@ export default async function Page({ params: paramsPromise }: Args) {
           <p>Bereiding: {preparationTime} min</p>
           <div className="flex flex-row gap-8">
           {ingredients && ingredients.length > 0 && <IngredientsList ingredients={ingredients} />}
-          {cookingInstructions && <RichText className="max-w-[48rem] mx-auto" content={cookingInstructions} enableGutter={false} />}
+          {cookingInstructions && <RichText className="w-full" content={cookingInstructions} enableGutter={true} />}
           </div>
         </div>
       </div>
