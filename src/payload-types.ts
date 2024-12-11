@@ -658,26 +658,31 @@ export interface Recipe {
   slugLock?: boolean | null;
   averageRating?: number | null;
   totalRatings?: number | null;
-  ingredients: (number | Ingredient)[];
-  relatedIngredients?: (number | Ingredient)[] | null;
-  preparationTime?: string | null;
+  ingredients?: (number | Ingredient)[] | null;
+  preparationTime?: number | null;
   categories?: (number | Category)[] | null;
   image?: (number | null) | Media;
-  cookingInstructions?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  cookingInstructionsRaw?: string | null;
+  cookingInstructions?:
+    | {
+        step?: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        id?: string | null;
+      }[]
+    | null;
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
   populatedAuthors?:
@@ -688,7 +693,7 @@ export interface Recipe {
     | null;
   updatedAt: string;
   createdAt: string;
-  _status: 'draft' | 'published' | 'draft' | 'published';
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -703,7 +708,6 @@ export interface Ingredient {
   ingredientsAmount: number;
   measurements?: ('grams' | 'kilograms' | 'liters' | 'milliliters' | 'amount' | 'teaspoons' | 'tablespoons') | null;
   recipes?: (number | Recipe)[] | null;
-  relatedIngredients?: (number | Ingredient)[] | null;
   categories?: (number | Category)[] | null;
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
@@ -724,13 +728,7 @@ export interface Ingredient {
 export interface Course {
   id: number;
   title: string;
-  relatedCourses?: (number | Course)[] | null;
   categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
   populatedAuthors?:
@@ -752,13 +750,9 @@ export interface Course {
 export interface CookingTechnique {
   id: number;
   title: string;
-  relatedCookingTechnique?: (number | Course)[] | null;
+  slug?: string | null;
+  slugLock?: boolean | null;
   categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
   publishedAt?: string | null;
   authors?: (number | User)[] | null;
   populatedAuthors?:
@@ -767,8 +761,6 @@ export interface CookingTechnique {
         name?: string | null;
       }[]
     | null;
-  slug?: string | null;
-  slugLock?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -1251,11 +1243,16 @@ export interface RecipesSelect<T extends boolean = true> {
   averageRating?: T;
   totalRatings?: T;
   ingredients?: T;
-  relatedIngredients?: T;
   preparationTime?: T;
   categories?: T;
   image?: T;
-  cookingInstructions?: T;
+  cookingInstructionsRaw?: T;
+  cookingInstructions?:
+    | T
+    | {
+        step?: T;
+        id?: T;
+      };
   publishedAt?: T;
   authors?: T;
   populatedAuthors?:
@@ -1274,17 +1271,7 @@ export interface RecipesSelect<T extends boolean = true> {
  */
 export interface CoursesSelect<T extends boolean = true> {
   title?: T;
-  relatedCourses?: T;
   categories?: T;
-  meta?:
-    | T
-    | {
-        overview?: T;
-        title?: T;
-        image?: T;
-        description?: T;
-        preview?: T;
-      };
   publishedAt?: T;
   authors?: T;
   populatedAuthors?:
@@ -1305,17 +1292,9 @@ export interface CoursesSelect<T extends boolean = true> {
  */
 export interface CookingTechniquesSelect<T extends boolean = true> {
   title?: T;
-  relatedCookingTechnique?: T;
+  slug?: T;
+  slugLock?: T;
   categories?: T;
-  meta?:
-    | T
-    | {
-        overview?: T;
-        title?: T;
-        image?: T;
-        description?: T;
-        preview?: T;
-      };
   publishedAt?: T;
   authors?: T;
   populatedAuthors?:
@@ -1324,8 +1303,6 @@ export interface CookingTechniquesSelect<T extends boolean = true> {
         id?: T;
         name?: T;
       };
-  slug?: T;
-  slugLock?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1342,7 +1319,6 @@ export interface IngredientsSelect<T extends boolean = true> {
   ingredientsAmount?: T;
   measurements?: T;
   recipes?: T;
-  relatedIngredients?: T;
   categories?: T;
   publishedAt?: T;
   authors?: T;

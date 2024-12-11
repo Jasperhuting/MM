@@ -20,6 +20,7 @@ import { revalidateIngredient } from '../Ingredients/hooks/revalidateIngredient'
 import { slugField } from '@/fields/slug'
 import { getServerSideURL } from '@/utilities/getURL'
 import { addCurrentUserAsAuthor } from '@/hooks/addCurrentUserAsAuthor'
+import { AuthorsField, CategoriesField, ImageField, IngredientsAmountField, MeasurementsField, PopulateAuthorsField, PublishedAtField, RecipesField, TitleField } from '../fields'
 
 export const Ingredients: CollectionConfig = {
   slug: 'ingredients',
@@ -61,148 +62,51 @@ export const Ingredients: CollectionConfig = {
     useAsTitle: 'title',
   },
   fields: [
-    {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
+    TitleField,
     ...slugField(),
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      required: false,
-    },
-    {
-      name: 'ingredientsAmount',
-      type: 'number',
-      required: true,
-    },
-    {
-      name: 'measurements',
-      type: 'select',
-      options: [
-        {
-          label: 'Gram',
-          value: 'grams',
-        },
-        {
-          label: 'KiloGram',
-          value: 'kilograms',
-        },
-        {
-          label: 'Liter',
-          value: 'liters',
-        },
-        {
-          label: 'Milliliter',
-          value: 'milliliters',
-        },
-        {
-          label: 'Aantal',
-          value: 'amount',
-        },
-        {
-          label: 'Theelepel',
-          value: 'teaspoons',
-        },
-        {
-          label: 'Eetlepel',
-          value: 'tablespoons',
-        },
-      ],
-      required: false,
-    },
-    {
-      name: 'recipes',
-      type: 'relationship',
-      relationTo: 'recipes',
-      hasMany: true,
-      required: false,
-    },
-    {
-      name: 'relatedIngredients',
-      type: 'relationship',
-      admin: {
-        position: 'sidebar',
-      },
-      filterOptions: ({ id }) => {
-        return {
-          id: {
-            not_in: [id],
-          },
-        }
-      },
-      hasMany: true,
-      relationTo: 'ingredients',
-    },
-    {
-      name: 'categories',
-      type: 'relationship',
-      admin: {
-        position: 'sidebar',
-      },
-      hasMany: true,
-      relationTo: 'categories',
-    },
-    {
-      name: 'publishedAt',
-      type: 'date',
-      admin: {
-        date: {
-          pickerAppearance: 'dayAndTime',
-        },
-        position: 'sidebar',
-      },
-      hooks: {
-        beforeChange: [
-          ({ siblingData, value }) => {
-            if (siblingData._status === 'published' && !value) {
-              return new Date()
-            }
-            return value
-          },
-        ],
-      },
-    },
-    {
-      name: 'authors',
-      type: 'relationship',
-      admin: {
-        position: 'sidebar',
-      },
-      hasMany: true,
-      relationTo: 'users',
-    },
-    // This field is only used to populate the user data via the `populateAuthors` hook
-    // This is because the `user` collection has access control locked to protect user privacy
-    // GraphQL will also not return mutated user data that differs from the underlying schema
-    {
-      name: 'populatedAuthors',
-      type: 'array',
-      access: {
-        update: () => false,
-      },
-      admin: {
-        disabled: true,
-        readOnly: true,
-      },
-      fields: [
-        {
-          name: 'id',
-          type: 'text',
-        },
-        {
-          name: 'name',
-          type: 'text',
-        },
-      ],
-    },
+    ImageField,
+    IngredientsAmountField,    
+    MeasurementsField,
+    RecipesField,
+    CategoriesField,
+    PublishedAtField,
+    AuthorsField,
+    PopulateAuthorsField,
   ],
   hooks: {
     beforeChange: [addCurrentUserAsAuthor],
-    afterChange: [revalidateIngredient],
-    
+    afterChange: [
+      revalidateIngredient,
+      async ({ doc, operation, req: { payload } }) => {
+        // After an ingredient is created or updated, update the recipes' ingredients field
+        if (operation === 'create' || operation === 'update') {
+          const recipes = doc.recipes || []
+
+          // For each recipe that uses this ingredient
+          for (const recipeId of recipes) {
+            // Get the current recipe
+            const recipe = await payload.findByID({
+              collection: 'recipes',
+              id: recipeId,
+            })
+
+            // Get current ingredients list and ensure it's an array
+            const currentIngredients = recipe?.ingredients || []
+
+            // Only update if this ingredient isn't already in the recipe's ingredients list
+            if (!currentIngredients.some(ingredientId => ingredientId === doc.id)) {
+              await payload.update({
+                collection: 'recipes',
+                id: recipeId,
+                data: {
+                  ingredients: [...currentIngredients, doc.id],
+                },
+              })
+            }
+          }
+        }
+      },
+    ],
   },
   versions: {
     drafts: {

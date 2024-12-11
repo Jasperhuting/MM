@@ -5,10 +5,24 @@ import { Button } from "@payloadcms/ui"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Recipe } from '@/payload-types'
+import { RecipeType } from './page'
 
 interface PageClientProps {
   addIngredients: (formData: FormData) => Promise<{ formData: FormData; ids: number[]; }>
-  addRecipe: (formData: { title: string; preparation: { preparationTime: string; steps: string[]; } }, ingredients: number[]) => Promise<void>
+  addRecipe: (recipe: RecipeType) => Promise<void>
+}
+
+interface RecipeData {
+  title: string;
+  preparation: {
+    preparationTime: string;
+    steps: string[];
+  };
+  ingredients: {
+    title: string;
+    ingredientsAmount: number;
+    measurements: string[];
+  }[];
 }
 
 const defaultRecipe = `
@@ -85,6 +99,9 @@ const PageClient: React.FC<PageClientProps> = ({ addIngredients, addRecipe }) =>
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [recipeText, setRecipeText] = useState(defaultRecipe)
+  const [ingredientIds, setIngredientIds] = useState<number[]>([])
+
+  const [recipeObject, setRecipeObject] = useState<Recipe>()
 
   useEffect(() => {
     setHeaderTheme('light')
@@ -116,27 +133,45 @@ const PageClient: React.FC<PageClientProps> = ({ addIngredients, addRecipe }) =>
     setError(null)
 
     try {
-      // Validate JSON
-      JSON.parse(recipeText)
+      // Parse and validate the JSON recipe
+      const recipeData = JSON.parse(recipeText) as RecipeData
       
       const formData = new FormData()
       formData.append('recipeText', recipeText)
       
-      await addIngredients(formData).then(async (returnValue) => {
-        console.log('returnValue', returnValue)
-        console.log('formData', formData)
-        await addRecipe(returnValue.formData, returnValue.ids)
-      })
+      const returnValue = await addIngredients(formData)
 
+      setIngredientIds(returnValue.ids)
+      
+      // Transform the data into the expected structure
+  
+
+      setRecipeObject(recipeObject)
     
-
       setError('Ingredients added successfully!')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add ingredients')
     } finally {
       setIsLoading(false)
     }
-  }
+
+    }
+
+    useEffect(() => {
+      if (ingredientIds?.length > 0)
+        addRecipe({
+            title: recipeObject?.title || 'dit is een test recept',
+            preparationTime: 200,
+            cookingInstructions: ['step 1', 'step 2'],
+            ingredients: ingredientIds
+          })
+
+    }, [ingredientIds])
+    
+    
+        
+    
+    
 
   return (
     <div className="container grid gap-8">
@@ -164,6 +199,8 @@ const PageClient: React.FC<PageClientProps> = ({ addIngredients, addRecipe }) =>
           {error}
         </div>
       )}
+
+      {ingredientIds.map((id, index) => <p key={index}>{id}</p>)}
 
       {recipeText && (
         <div className="mt-8">

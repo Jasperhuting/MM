@@ -22,6 +22,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { getServerSideURL } from '@/utilities/getURL'
 import { StepBlock } from '@/blocks/StepBlock/config'
+import { PublishedAtField, TitleField } from '../fields'
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
@@ -60,11 +61,7 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
   },
   fields: [
-    {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
+    TitleField,
     {
       type: 'tabs',
       tabs: [
@@ -112,13 +109,7 @@ export const Pages: CollectionConfig = {
         },
       ],
     },
-    {
-      name: 'publishedAt',
-      type: 'date',
-      admin: {
-        position: 'sidebar',
-      },
-    },
+    PublishedAtField,
     ...slugField(),
   ],
   hooks: {

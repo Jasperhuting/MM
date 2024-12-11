@@ -2,6 +2,7 @@
 import { CollectionConfig } from 'payload';
 import { authenticated } from '../../access/authenticated';
 import { addCurrentUserAsAuthor } from '@/hooks/addCurrentUserAsAuthor';
+import { UsersField } from '../fields';
 
 export const Ratings: CollectionConfig = {
   slug: 'ratings',
@@ -51,10 +52,6 @@ export const Ratings: CollectionConfig = {
       validate: async (val, options) => {
         const { user, payload } = options?.req;
 
-
-        console.log('validate: payload', payload);
-        console.log('validate: val', val);
-
         if (!val) return 'Please select a recipe to rate';
         if (!user) return 'You must be logged in to rate a recipe';
       
@@ -69,16 +66,10 @@ export const Ratings: CollectionConfig = {
             }
           ]
         };
-
-        console.log('validate: query', query);
-      
         const existingRating = await payload?.find({
           collection: 'ratings',
           where: query,
         });
-
-        console.log('validate: existingRating', existingRating);
-      
         if (existingRating?.totalDocs > 0) {
           return 'You have already rated this recipe';
         }
@@ -103,15 +94,7 @@ export const Ratings: CollectionConfig = {
         description: 'Optional comment about your rating',
       },
     },
-    {
-      name: 'user',
-      type: 'relationship',
-      relationTo: 'users',
-      required: true,
-      admin: {
-        readOnly: false,
-      },
-    },
+    UsersField,
   ],
   hooks: {
     beforeChange: [addCurrentUserAsAuthor, 

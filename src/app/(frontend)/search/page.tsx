@@ -18,7 +18,7 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
   const payload = await getPayload({ config: configPromise })
 
   const recipes = await payload.find({
-    collection: 'search',
+    collection: 'recipes',
     depth: 1,
     limit: 12,
     ...(query

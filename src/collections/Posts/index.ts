@@ -20,6 +20,7 @@ import { revalidatePost } from './hooks/revalidatePost'
 import { addCurrentUserAsAuthor } from '../../hooks/addCurrentUserAsAuthor'
 import { slugField } from '@/fields/slug'
 import { getServerSideURL } from '@/utilities/getURL'
+import { AuthorsField, CategoriesField, PublishedAtField, TitleField } from '../fields'
 
 export const Posts: CollectionConfig = {
   slug: 'posts',
@@ -76,11 +77,7 @@ export const Posts: CollectionConfig = {
         position: 'sidebar',
       },
     },
-    {
-      name: 'title',
-      type: 'text',
-      required: true,
-    },
+    TitleField,
     {
       type: 'tabs',
       tabs: [
@@ -125,44 +122,9 @@ export const Posts: CollectionConfig = {
               hasMany: true,
               relationTo: 'posts',
             },
-            {
-              name: 'categories',
-              type: 'relationship',
-              relationTo: 'categories',
-              hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
-              name: 'authors',
-              type: 'relationship',
-              relationTo: 'users',
-              hasMany: true,
-              admin: {
-                position: 'sidebar',
-              },
-            },
-            {
-              name: 'publishedAt',
-              type: 'date',
-              admin: {
-                date: {
-                  pickerAppearance: 'dayAndTime',
-                },
-                position: 'sidebar',
-              },
-              hooks: {
-                beforeChange: [
-                  ({ siblingData, value }) => {
-                    if (siblingData._status === 'published' && !value) {
-                      return new Date()
-                    }
-                    return value
-                  },
-                ],
-              },
-            },
+            CategoriesField,
+            AuthorsField,
+            PublishedAtField,
             {
               name: 'populatedAuthors',
               type: 'array',

@@ -11,6 +11,7 @@ import { Media } from '@/components/Media'
 import type { Ingredient, Recipe } from '@/payload-types'
 
 import PageClient from './page.client'
+import { RecipesList } from '@/components/RecipesList'
 
 type Args = {
   params: Promise<{
@@ -25,11 +26,13 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   const ingredient = await queryIngredientBySlug({ slug })
 
+  console.log(ingredient)
+
   if (!ingredient) {
     return <PayloadRedirects url={url} />
   }
 
-  const { image } = ingredient
+  const { image, recipes } = ingredient
 
   return (
     <article className="pt-16 pb-24">
@@ -49,6 +52,9 @@ export default async function Page({ params: paramsPromise }: Args) {
             />
           )}          
         </div>
+        <div className="flex flex-row gap-8">
+          {recipes && recipes.length > 0 && <RecipesList recipes={recipes} />}
+          </div>
       </div>
     </article>
   )

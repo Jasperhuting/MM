@@ -2,9 +2,17 @@ import { getPayload } from "payload"
 import configPromise from '@payload-config'
 import { redirect } from 'next/navigation'
 import PageClient from "./page.client"
+import { Recipe } from "@/payload-types"
 
 type FormatType = "" | "left" | "start" | "center" | "right" | "end" | "justify"
 type DirectionType = "ltr" | "rtl" | null;
+
+export interface RecipeType {
+  title: string;
+  ingredients: number[];
+  preparationTime: number;
+  cookingInstructions: string[];
+}
 
 async function addIngredients(formData: FormData) {
   'use server'
@@ -28,6 +36,7 @@ async function addIngredients(formData: FormData) {
           title: ingredient.title,
           ingredientsAmount: ingredient.ingredientsAmount,
           measurements: measurements.includes(ingredient.measurements[0]) ? ingredient.measurements[0] : 'amount',
+          _status: 'published' as const
         }
       })
       
@@ -43,270 +52,59 @@ async function addIngredients(formData: FormData) {
     throw new Error('Failed to add ingredients')
   }
 }
-
-async function addRecipe(formData: { title: string; preparation: { preparationTime: string; steps: string[]; } }, ingredients: number[]) {
+// formData: Recipe
+async function addRecipe(recipe: RecipeType) {
   'use server'
 
-  debugger;
+//   console.log(formData)
 
   try {
     
-
-    
-
-    
     const payload = await getPayload({ config: configPromise })
     
-    // Create the data object first so we can inspect it
-    const recipeData = {
-      title: formData.title,
-      ingredients: [...ingredients],
-      authors: [1],
-      image: 8,
-      cookingInstructions: {
-        "root": {
-            "children": [
-                {
-                    "children": [
-                        {
-                            "detail": 0,
-                            "format": "" as FormatType,
-                            "mode": "normal",
-                            "style": "",
-                            "text": "asdsa",
-                            "type": "text",
-                            "version": 1
-                        }
-                    ],
-                    "direction": "ltr" as DirectionType,
-                    "format": "" as FormatType,
-                    "indent": 0,
-                    "type": "paragraph",
-                    "version": 1,
-                    "textFormat": 0,
-                    "textStyle": ""
-                },
-                {
-                    "children": [],
-                    "direction": null as DirectionType,
-                    "format": "" as FormatType,
-                    "indent": 0,
-                    "type": "paragraph",
-                    "version": 1,
-                    "textFormat": 0,
-                    "textStyle": ""
-                },
-                {
-                    "format": "" as FormatType,
-                    "type": "block",
-                    "version": 2,
-                    "fields": {
-                        "id": "674f6a63e3ccf828e3d9d6dc",
-                        "blockName": "",
-                        "arrayField": [
-                            {
-                                "id": "674f6a66e7e99b6cd1b61e19",
-                                "step": "1",
-                                "stepcontent": {
-                                    "root": {
-                                        "children": [
-                                            {
-                                                "children": [
-                                                    {
-                                                        "detail": 0,
-                                                        "format": 0,
-                                                        "mode": "normal",
-                                                        "style": "",
-                                                        "text": "dat weet ik nog niet",
-                                                        "type": "text",
-                                                        "version": 1
-                                                    }
-                                                ],
-                                                "direction": "ltr" as DirectionType,
-                                                "format": "" as FormatType,
-                                                "indent": 0,
-                                                "type": "paragraph",
-                                                "version": 1,
-                                                "textFormat": 0,
-                                                "textStyle": ""
-                                            }
-                                        ],
-                                        "direction": "ltr" as DirectionType,
-                                        "format": "" as FormatType,
-                                        "indent": 0,
-                                        "type": "root",
-                                        "version": 1
-                                    }
-                                }
-                            }
-                        ],
-                        "blockType": "stepBlock"
-                    }
-                }
-            ],
-            "direction": "ltr" as DirectionType,
-            "format": "" as FormatType,
-            "indent": 0,
-            "type": "root",
-            "version": 1
-        }
-    },
-      preparationTime: String(formData.preparation.preparationTime),
-      _status: 'published' as const,
-    }
-
-    const tempRecipeData = {
-        "slug": "pompoenrisotto",
-        "title": "Pompoenrisotto",
-        "image": 8,
-        "_status": "published",
-        "authors": [1],
-        "slugLock": true,
-        "updatedAt": "2024-12-03T21:37:24.644Z",
-        "createdAt": "2024-12-03T21:37:24.644Z",
-        "categories": [],
-        "publishedAt": "2024-12-03T21:37:24.643Z",
-        "ingredients": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        "totalRatings": null,
-        "averageRating": null,
-        "preparationTime": "40",
-        "relatedIngredients": [],
-        "cookingInstructions": {
-          "root": {
-            "children": [
-              {
-                "children": [
-                  {
-                    "detail": 0,
-                    "mode": "normal",
-                    "style": "",
-                    "text": "asdsa",
-                    "type": "text",
-                    "version": 1
-                  }
-                ],
-                "direction": "ltr",
-                "format": "",
-                "indent": 0,
-                "type": "paragraph",
-                "version": 1,
-                "textFormat": 0,
-                "textStyle": ""
-              },
-              {
-                "children": [],
-                "direction": "ltr",
-                "format": "",
-                "indent": 0,
-                "type": "paragraph",
-                "version": 1,
-                "textFormat": 0,
-                "textStyle": ""
-              },
-              {
-                "format": "",
-                "type": "block",
-                "version": 2,
-                "fields": {
-                  "id": "674f7a14d9a0e8744c8657ab",
-                  "blockName": "",
-                  "arrayField": [
-                    {
-                      "id": "674f7a14d9a0e8744c8657ac",
-                      "step": "1",
-                      "stepcontent": {
-                        "root": {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "detail": 0,
-                                  "format": 0,
-                                  "mode": "normal",
-                                  "style": "",
-                                  "text": "dat weet ik nog niet",
-                                  "type": "text",
-                                  "version": 1
-                                }
-                              ],
-                              "direction": "ltr",
-                              "format": "",
-                              "indent": 0,
-                              "type": "paragraph",
-                              "version": 1,
-                              "textFormat": 0,
-                              "textStyle": ""
-                            }
-                          ],
-                          "direction": "ltr",
-                          "format": "",
-                          "indent": 0,
-                          "type": "root",
-                          "version": 1
-                        }
-                      }
-                    },
-                    {
-                      "id": "674f7a49f116e8cfa2d6eb89",
-                      "step": "2",
-                      "stepcontent": {
-                        "root": {
-                          "children": [
-                            {
-                              "children": [
-                                {
-                                  "detail": 0,
-                                  "format": 0,
-                                  "mode": "normal",
-                                  "style": "",
-                                  "text": "dit is nog vaak",
-                                  "type": "text",
-                                  "version": 1
-                                }
-                              ],
-                              "direction": "ltr",
-                              "format": "",
-                              "indent": 0,
-                              "type": "paragraph",
-                              "version": 1,
-                              "textFormat": 0,
-                              "textStyle": ""
-                            }
-                          ],
-                          "direction": "ltr",
-                          "format": "",
-                          "indent": 0,
-                          "type": "root",
-                          "version": 1
-                        }
-                      }
-                    }
-                  ],
-                  "blockType": "stepBlock"
-                }
-              }
-            ],
-            "direction": "ltr",
-            "format": "",
-            "indent": 0,
-            "type": "root",
-            "version": 1
-          }
+    // First verify if ingredients exist
+    const existingIngredients = await payload.find({
+      collection: 'ingredients',
+      where: {
+        id: {
+          in: recipe.ingredients
         }
       }
-
-    console.log('Recipe data to be saved:', JSON.stringify(recipeData, null, 2))
+    });
     
-    const test = await payload.create({
+    console.log('Found ingredients:', existingIngredients);
+    
+    if (existingIngredients.docs.length !== recipe.ingredients.length) {
+      throw new Error('Some ingredients do not exist in the database');
+    }
+
+    const recipeData = {
+      title: recipe.title,
+      preparationTime: recipe.preparationTime,
+      cookingInstructionsRaw: JSON.stringify(recipe.cookingInstructions),
+      ingredients: existingIngredients.docs.map(doc => doc.id),
+      _status: 'published' as const
+    };
+    
+    console.log('Recipe data to be saved:', JSON.stringify(recipeData, null, 2));
+    
+    const result = await payload.create({
       collection: 'recipes',
-      data: tempRecipeData
+      data: recipeData
     })
 
-    console.log('Recipe saved:', test)
+    console.log('Recipe created:', result);
+
+    return undefined
+
+    // console.log('Recipe saved:', test)
     
   } catch (error) {
     console.error('Error adding recipe:', error)
-    throw new Error('Failed to add recipe')
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    if (error.data) {
+      console.error('Validation errors:', error.data)
+    }
   }
 }   
 
